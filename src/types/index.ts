@@ -59,7 +59,7 @@ export interface IPlayer {
     role: string;
 }
 
-export interface ServerInfo {
+export interface IServer {
     MaxPlayers: number;
     GameMode_s: string;
     MapName_s: string;

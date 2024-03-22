@@ -1,4 +1,4 @@
-import { ILayer, IOptions, IPlayer, ISquad, ITeams, ServerInfo } from './types';
+import { ILayer, IOptions, IPlayer, IServer, ISquad, ITeams } from './types';
 
 import Rcon from './structures/Rcon';
 
@@ -40,7 +40,7 @@ export class SquadClient extends Rcon {
         return object;
     }
 
-    public async getServerInfo(): Promise<ServerInfo> {
+    public async getServerInfo(): Promise<IServer> {
         const serverInfo: string = await super.execute('ShowServerInfo');
 
         await super.disconnect();
@@ -50,14 +50,12 @@ export class SquadClient extends Rcon {
 
     public async getLayers(): Promise<ILayer> {
         const response: string = await super.execute('ShowCurrentMap');
+        await super.disconnect();
+        const rawServerInfo: string = await super.execute('ShowServerInfo');
+        await super.disconnect();
 
         const match: RegExpMatchArray | null = response.match(/^Current level is (.*), layer is (.*)/);
-
-        await super.disconnect();
-
-        const serverInfo: ServerInfo = await this.getServerInfo();
-
-        await super.disconnect();
+        const serverInfo: IServer = JSON.parse(rawServerInfo);
 
         return {
             current: match ? match[2] : null,
