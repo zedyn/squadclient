@@ -53,6 +53,8 @@ export class SquadClient extends Rcon {
 
         const match: RegExpMatchArray | null = response.match(/^Current level is (.*), layer is (.*)/);
 
+        await super.disconnect();
+
         const serverInfo: ServerInfo = await this.getServerInfo();
 
         await super.disconnect();
