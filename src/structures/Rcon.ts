@@ -84,7 +84,7 @@ export default class Rcon extends EventEmitter {
             const onError = (err: Error) => {
                 this.client.removeListener('connect', onConnect);
 
-                console.error(`Failed to connect to: ${this.host}:${this.port}`, err);
+                console.log(`Squad Client | Failed to connect to: ${this.host}:${this.port}`, err);
 
                 reject(err);
             };
@@ -95,7 +95,7 @@ export default class Rcon extends EventEmitter {
             if (this.host && this.port) {
                 this.client.connect({ host: this.host, port: this.port });
             } else {
-                console.error('Failed to connect! Host or port undefined.');
+                console.log('Squad Client | Failed to connect! Host or port undefined.');
                 reject('Failed to connect! Host or port undefined.');
             }
         });
@@ -112,7 +112,7 @@ export default class Rcon extends EventEmitter {
             const onError = (err: Error) => {
                 this.client.removeListener('close', onClose);
 
-                console.error(`Failed to disconnect from: ${this.host}:${this.port}`, err);
+                console.log(`Squad Client | Failed to disconnect from: ${this.host}:${this.port}`, err);
 
                 reject(err);
             };
@@ -157,7 +157,9 @@ export default class Rcon extends EventEmitter {
         this.connected = false;
         this.loggedin = false;
 
-        console.error(`Socket closed ${hadError ? 'with' : 'without'} an error. ${hadError}`);
+        if (hadError) {
+            console.log(`Squad Client | ${hadError}`);
+        }
 
         if (this.incomingData.length > 0) {
             this.incomingData = Buffer.from([]);
@@ -180,7 +182,7 @@ export default class Rcon extends EventEmitter {
         }
     }
     private onError(err: Error) {
-        console.error(`Socket had error:`, err);
+        console.log(`Squad Client | Socket had error:`, err);
         this.emit('RCON_ERROR', err);
     }
 
@@ -282,7 +284,7 @@ export default class Rcon extends EventEmitter {
             }
 
             const onError = (err: Error) => {
-                console.error('Error occurred. Wiping response action queue.', err);
+                console.log('Squad Client | Error occurred. Wiping response action queue.', err);
                 this.responseCallbackQueue = [];
                 reject(err);
             };
@@ -295,7 +297,7 @@ export default class Rcon extends EventEmitter {
                     this.client.removeListener('error', onError);
 
                     if (decodedPacket.id === -1) {
-                        console.error('Authentication failed.');
+                        console.log('Squad Client | Authentication failed.');
                         reject(new Error('Authentication failed.'));
                     } else {
                         this.loggedin = true;
