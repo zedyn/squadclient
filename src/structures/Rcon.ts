@@ -71,8 +71,6 @@ export default class Rcon extends EventEmitter {
                 this.client.removeListener('error', onError);
                 this.connected = true;
 
-                console.info(`Connected to: ${this.host}:${this.port}`);
-
                 try {
                     await this.write(ServerData.AUTH, this.password);
 
@@ -107,8 +105,6 @@ export default class Rcon extends EventEmitter {
         return new Promise((resolve, reject) => {
             const onClose = () => {
                 this.client.removeListener('error', onError);
-
-                console.info(`Disconnected from: ${this.host}:${this.port}`);
 
                 resolve();
             };
