@@ -1,0 +1,29 @@
+{
+    "name": "squadclient",
+    "version": "0.0.1",
+    "description": "The module enables you to easily perform certain actions by connecting to the game console through your Squad game server using RCON.",
+    "main": "./dist/index.js",
+    "module": "./dist.index.mjs",
+    "types": "./dist/index.d.ts",
+    "homepage": "https://github.com/zedyn",
+    "repository": {
+        "url": "https://github.com/zedyn/squadclient"
+    },
+    "scripts": {
+        "build": "tsup"
+    },
+    "keywords": [
+        "rcon",
+        "squad",
+        "squadjs",
+        "squadstats"
+    ],
+    "author": "zédyN",
+    "license": "MIT",
+    "devDependencies": {
+        "@types/events": "^3.0.3",
+        "@types/node": "^20.11.30",
+        "tsup": "^8.0.2",
+        "typescript": "^5.4.3"
+    }
+}
