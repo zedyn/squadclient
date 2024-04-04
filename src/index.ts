@@ -10,13 +10,9 @@ export class SquadClient extends Rcon {
     public async getTeams(): Promise<ITeams> {
         const response: string[] = (await super.execute('ListSquads')).split('\n');
 
-        const indexOfTeamA: number = response.findIndex(
-            (line: string) => line.includes('Team ID: 1') && line.endsWith(')')
-        );
+        const indexOfTeamA: number = response.findIndex((line: string) => line.includes('Team ID: 1') && line.endsWith(')'));
 
-        const indexOfTeamB: number = response.findIndex(
-            (line: string) => line.includes('Team ID: 2') && line.endsWith(')')
-        );
+        const indexOfTeamB: number = response.findIndex((line: string) => line.includes('Team ID: 2') && line.endsWith(')'));
 
         const object: ITeams = {
             teamA: '',
@@ -35,24 +31,19 @@ export class SquadClient extends Rcon {
             object.teamB = null;
         }
 
-        await super.disconnect();
-
         return object;
     }
 
     public async getServerInfo(): Promise<IServer> {
         const serverInfo: string = await super.execute('ShowServerInfo');
 
-        await super.disconnect();
-
         return JSON.parse(serverInfo);
     }
 
     public async getLayers(): Promise<ILayer> {
         const response: string = await super.execute('ShowCurrentMap');
-        await super.disconnect();
+
         const rawServerInfo: string = await super.execute('ShowServerInfo');
-        await super.disconnect();
 
         const match: RegExpMatchArray | null = response.match(/^Current level is (.*), layer is (.*)/);
         const serverInfo: IServer = JSON.parse(rawServerInfo);
@@ -107,8 +98,6 @@ export class SquadClient extends Rcon {
             });
         }
 
-        await super.disconnect();
-
         return squads;
     }
 
@@ -138,8 +127,6 @@ export class SquadClient extends Rcon {
                 ...data,
             });
         }
-
-        await super.disconnect();
 
         return players;
     }
