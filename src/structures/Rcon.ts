@@ -61,10 +61,6 @@ export default class Rcon extends EventEmitter {
     }
 
     public async execute(command: string): Promise<string> {
-        if (!this.connected) {
-            await this.connect();
-        }
-
         return this.write(ServerData.EXECCOMMAND, command);
     }
 

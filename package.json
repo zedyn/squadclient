@@ -1,6 +1,6 @@
 {
     "name": "squadclient",
-    "version": "0.0.8",
+    "version": "0.0.9",
     "description": "The module enables you to easily perform certain actions by connecting to the game console through your Squad game server using RCON.",
     "main": "./dist/index.js",
     "module": "./dist.index.mjs",
