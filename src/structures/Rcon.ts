@@ -92,7 +92,7 @@ export default class Rcon extends EventEmitter {
             this.client.once('connect', onConnect);
             this.client.once('error', onError);
 
-            if (this.host && this.port) {
+            if (this.host && this.port && !this.connected) {
                 this.client.connect({ host: this.host, port: this.port });
             } else {
                 console.log('Squad Client | Failed to connect! Host or port undefined.');
@@ -203,10 +203,7 @@ export default class Rcon extends EventEmitter {
 
             const matchCount = this.callbackIds.filter((d) => d.id === decodedPacket.count);
 
-            if (
-                matchCount.length > 0 ||
-                [ServerData.AUTH_RESPONSE, ServerData.CHAT_VALUE].includes(decodedPacket.type)
-            ) {
+            if (matchCount.length > 0 || [ServerData.AUTH_RESPONSE, ServerData.CHAT_VALUE].includes(decodedPacket.type)) {
                 this.onPacket(decodedPacket);
                 this.incomingData = this.incomingData.slice(packetSize);
                 continue;
@@ -270,11 +267,7 @@ export default class Rcon extends EventEmitter {
                 return;
             }
 
-            const encodedPacket = this.encodePacket(
-                type,
-                type !== ServerData.AUTH ? Packet.MID_PACKET_ID : Packet.END_PACKET_ID,
-                body
-            );
+            const encodedPacket = this.encodePacket(type, type !== ServerData.AUTH ? Packet.MID_PACKET_ID : Packet.END_PACKET_ID, body);
 
             const encodedEmptyPacket = this.encodePacket(type, Packet.END_PACKET_ID, '');
 
