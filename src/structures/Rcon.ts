@@ -64,7 +64,7 @@ export default class Rcon extends EventEmitter {
         return this.write(ServerData.EXECCOMMAND, command);
     }
 
-    private async connect(): Promise<void> {
+    public async connect(): Promise<void> {
         return new Promise((resolve, reject) => {
             const onConnect = async () => {
                 this.client.removeListener('error', onError);
