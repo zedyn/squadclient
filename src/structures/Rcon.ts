@@ -120,6 +120,7 @@ export default class Rcon extends EventEmitter {
             this.client.once('error', onError);
 
             this.autoReconnect = false;
+            this.connected = false;
 
             clearTimeout(this.autoReconnectTimeout);
 
@@ -152,6 +153,7 @@ export default class Rcon extends EventEmitter {
                 this.onClose('Unknown Packet');
         }
     }
+
     private onClose(hadError: string) {
         this.connected = false;
         this.loggedin = false;
@@ -180,6 +182,7 @@ export default class Rcon extends EventEmitter {
             setTimeout(this.connect, this.autoReconnectDelay);
         }
     }
+
     private onError(err: Error) {
         console.log(`Squad Client | Socket had error:`, err);
         this.emit('RCON_ERROR', err);
