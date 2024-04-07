@@ -154,9 +154,11 @@ export default class Rcon extends EventEmitter {
         }
     }
 
-    private onClose(hadError: string) {
+    private async onClose(hadError: string) {
         this.connected = false;
         this.loggedin = false;
+
+        await this.disconnect();
 
         if (hadError) {
             console.log(`Squad Client | ${hadError}`);
