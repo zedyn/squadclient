@@ -8,6 +8,10 @@ export class SquadClient extends Rcon {
     }
 
     public async getTeams(): Promise<ITeams> {
+        if (!super.isConnected()) {
+            await super.connect();
+        }
+
         const response: string[] = (await super.execute('ListSquads')).split('\n');
 
         const indexOfTeamA: number = response.findIndex((line: string) => line.includes('Team ID: 1') && line.endsWith(')'));
@@ -35,12 +39,20 @@ export class SquadClient extends Rcon {
     }
 
     public async getServerInfo(): Promise<IServer> {
+        if (!super.isConnected()) {
+            await super.connect();
+        }
+
         const serverInfo: string = await super.execute('ShowServerInfo');
 
         return JSON.parse(serverInfo);
     }
 
     public async getLayers(): Promise<ILayer> {
+        if (!super.isConnected()) {
+            await super.connect();
+        }
+
         const response: string = await super.execute('ShowCurrentMap');
 
         const rawServerInfo: string = await super.execute('ShowServerInfo');
@@ -55,6 +67,10 @@ export class SquadClient extends Rcon {
     }
 
     public async getSquads(): Promise<ISquad[]> {
+        if (!super.isConnected()) {
+            await super.connect();
+        }
+
         const responseSquad = await super.execute('ListSquads');
 
         const squads: ISquad[] = [];
@@ -102,6 +118,10 @@ export class SquadClient extends Rcon {
     }
 
     public async getPlayers(): Promise<IPlayer[]> {
+        if (!super.isConnected()) {
+            await super.connect();
+        }
+
         const response: string = await super.execute('ListPlayers');
 
         const players: IPlayer[] = [];

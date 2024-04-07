@@ -100,6 +100,10 @@ export default class Rcon extends EventEmitter {
         });
     }
 
+    public isConnected(): boolean {
+        return this.connected;
+    }
+
     public async disconnect(): Promise<void> {
         return new Promise((resolve, reject) => {
             const onClose = () => {
