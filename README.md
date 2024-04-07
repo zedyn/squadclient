@@ -39,6 +39,8 @@ import { SquadClient } from 'squadclient';
 const client = new SquadClient({ host: 'serverIp', port: rconPort, password: 'rconPassword' });
 
 (async () => {
+    await client.connect();
+
     const info = await client.getServerInfo();
 
     console.log(info);
