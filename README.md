@@ -30,6 +30,72 @@ The module enables you to easily perform certain actions by connecting to the ga
 -   **getSquads()** - Get squads and details.
 -   **getPlayers()** - Get players.
 
+## Events
+
+-   **squadCreate** - Emitted whenever a squad is created.
+
+```javascript
+{
+    time: Date,
+    playerName: string,
+    playerEOSID: string,
+    playerSteamID: string,
+    squadID: string,
+    squadName: string,
+    teamName: string
+}
+```
+
+-   **chatMessage** - Emitted whenever a message is created.
+
+```javascript
+{
+    raw: string,
+    chat: 'ChatAll' | 'ChatTeam' | 'ChatSquad',
+    eosID: string,
+    steamID: string,
+    name: string,
+    message: string,
+    time: Date
+}
+```
+
+-   **playerKicked** - Emitted whenever a player kicked from server.
+
+```javascript
+{
+    raw: string,
+    playerID: string,
+    steamID: string,
+    name: string,
+    time: Date
+}
+```
+
+-   **playerBanned** - Emitted whenever a player banned from server.
+
+```javascript
+{
+    raw: string,
+    playerID: string,
+    steamID: string,
+    name: string,
+    interval: string,
+    time: Date
+}
+```
+
+-   **playerWarned** - Emitted whenever a player warned.
+
+```javascript
+{
+    raw: string,
+    name: string,
+    reason: string,
+    time: Date
+}
+```
+
 ## Usage / Examples
 
 ```javascript
@@ -44,6 +110,10 @@ const client = new SquadClient({ host: 'serverIp', port: rconPort, password: 'rc
     const info = await client.getServerInfo();
 
     console.log(info);
+
+    client.on('squadCreate', (squad) => {
+        console.log('A squad has been created!', `Squad Name: ${squad.squadName} | Team Name: ${squad.teamName}`);
+    });
 })();
 ```
 

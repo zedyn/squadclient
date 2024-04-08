@@ -100,10 +100,6 @@ export default class Rcon extends EventEmitter {
         });
     }
 
-    public isConnected(): boolean {
-        return this.connected;
-    }
-
     public async disconnect(): Promise<void> {
         return new Promise((resolve, reject) => {
             const onClose = () => {
@@ -132,6 +128,81 @@ export default class Rcon extends EventEmitter {
         });
     }
 
+    public isConnected(): boolean {
+        return this.connected;
+    }
+
+    private processChatPacket(decodedPacket: IDecodedPacket) {
+        const matchSqCreated = decodedPacket.body.match(
+            /(?<playerName>.+) \(Online IDs: EOS: (?<playerEOSID>[\da-f]{32})(?: steam: (?<playerSteamID>\d{17}))?\) has created Squad (?<squadID>\d+) \(Squad Name: (?<squadName>.+)\) on (?<teamName>.+)/
+        );
+
+        const matchChat = decodedPacket.body.match(
+            /\[(ChatAll|ChatTeam|ChatSquad|ChatAdmin)] \[Online IDs:EOS: ([0-9a-f]{32}) steam: (\d{17})\] (.+?) : (.*)/
+        );
+
+        const matchKick = decodedPacket.body.match(/Kicked player ([0-9]+)\. \[Online IDs= EOS: ([0-9a-f]{32}) steam: (\d{17})] (.*)/);
+        const matchBan = decodedPacket.body.match(/Banned player ([0-9]+)\. \[steamid=(.*?)\] (.*) for interval (.*)/);
+        const matchWarn = decodedPacket.body.match(/Remote admin has warned player (.*)\. Message was "(.*)"/);
+
+        if (matchSqCreated) {
+            this.emit('squadCreate', {
+                time: new Date(),
+                ...matchSqCreated.groups,
+            });
+
+            return;
+        }
+
+        if (matchChat) {
+            this.emit('chatMessage', {
+                raw: decodedPacket.body,
+                chat: matchChat[1],
+                eosID: matchChat[2],
+                steamID: matchChat[3],
+                name: matchChat[4].trim(),
+                message: matchChat[5],
+                time: new Date(),
+            });
+
+            return;
+        }
+
+        if (matchKick) {
+            this.emit('playerKicked', {
+                raw: decodedPacket.body,
+                playerID: matchKick[1],
+                steamID: matchKick[3],
+                name: matchKick[4],
+                time: new Date(),
+            });
+
+            return;
+        }
+
+        if (matchBan) {
+            this.emit('playerBanned', {
+                raw: decodedPacket.body,
+                playerID: matchBan[1],
+                steamID: matchBan[2],
+                name: matchBan[3],
+                interval: matchBan[4],
+                time: new Date(),
+            });
+        }
+
+        if (matchWarn) {
+            this.emit('playerWarned', {
+                raw: decodedPacket.body,
+                name: matchWarn[1],
+                reason: matchWarn[2],
+                time: new Date(),
+            });
+
+            return;
+        }
+    }
+
     private onPacket(decodedPacket: IDecodedPacket) {
         switch (decodedPacket.type) {
             case ServerData.RESPONSE_VALUE:
@@ -152,6 +223,9 @@ export default class Rcon extends EventEmitter {
                         this.onClose('Unknown Packet');
                 }
 
+                break;
+            case ServerData.CHAT_VALUE:
+                this.processChatPacket(decodedPacket);
                 break;
             default:
                 this.onClose('Unknown Packet');
