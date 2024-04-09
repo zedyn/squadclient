@@ -1,3 +1,5 @@
+![Squad](https://assets-global.website-files.com/651dd1cea3817995c17fa3c1/65e0edc1ea8c1cc2607b4ddd_squadlogo_black_hires.png)
+
 # Squad Client
 
 The module enables you to easily perform certain actions by connecting to the game console through your Squad game server using RCON.
