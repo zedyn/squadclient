@@ -133,69 +133,101 @@ export default class Rcon extends EventEmitter {
     }
 
     private processChatPacket(decodedPacket: IDecodedPacket) {
-        const matchSqCreated = decodedPacket.body.match(
+        const onSquadCreate = decodedPacket.body.match(
             /(?<playerName>.+) \(Online IDs: EOS: (?<playerEOSID>[\da-f]{32})(?: steam: (?<playerSteamID>\d{17}))?\) has created Squad (?<squadID>\d+) \(Squad Name: (?<squadName>.+)\) on (?<teamName>.+)/
         );
 
-        const matchChat = decodedPacket.body.match(
+        const onMessage = decodedPacket.body.match(
             /\[(ChatAll|ChatTeam|ChatSquad|ChatAdmin)] \[Online IDs:EOS: ([0-9a-f]{32}) steam: (\d{17})\] (.+?) : (.*)/
         );
 
-        const matchKick = decodedPacket.body.match(/Kicked player ([0-9]+)\. \[Online IDs= EOS: ([0-9a-f]{32}) steam: (\d{17})] (.*)/);
-        const matchBan = decodedPacket.body.match(/Banned player ([0-9]+)\. \[steamid=(.*?)\] (.*) for interval (.*)/);
-        const matchWarn = decodedPacket.body.match(/Remote admin has warned player (.*)\. Message was "(.*)"/);
+        const onKick = decodedPacket.body.match(/Kicked player ([0-9]+)\. \[Online IDs= EOS: ([0-9a-f]{32}) steam: (\d{17})] (.*)/);
 
-        if (matchSqCreated) {
+        const onBan = decodedPacket.body.match(/Banned player ([0-9]+)\. \[steamid=(.*?)\] (.*) for interval (.*)/);
+
+        const onWarn = decodedPacket.body.match(/Remote admin has warned player (.*)\. Message was "(.*)"/);
+
+        const onPossessedAdminCam = decodedPacket.body.match(
+            /\[Online Ids:EOS: ([0-9a-f]{32}) steam: (\d{17})\] (.+) has possessed admin camera\./
+        );
+
+        const onUnpossessedAdminCam = decodedPacket.body.match(
+            /\[Online IDs:EOS: ([0-9a-f]{32}) steam: (\d{17})\] (.+) has unpossessed admin camera\./
+        );
+
+        if (onSquadCreate) {
             this.emit('squadCreate', {
                 time: new Date(),
-                ...matchSqCreated.groups,
+                ...onSquadCreate.groups,
             });
 
             return;
         }
 
-        if (matchChat) {
+        if (onMessage) {
             this.emit('chatMessage', {
                 raw: decodedPacket.body,
-                chat: matchChat[1],
-                eosID: matchChat[2],
-                steamID: matchChat[3],
-                name: matchChat[4].trim(),
-                message: matchChat[5],
+                chat: onMessage[1],
+                eosID: onMessage[2],
+                steamID: onMessage[3],
+                name: onMessage[4].trim(),
+                message: onMessage[5],
                 time: new Date(),
             });
 
             return;
         }
 
-        if (matchKick) {
+        if (onKick) {
             this.emit('playerKicked', {
                 raw: decodedPacket.body,
-                playerID: matchKick[1],
-                steamID: matchKick[3],
-                name: matchKick[4],
+                playerID: onKick[1],
+                steamID: onKick[3],
+                name: onKick[4],
                 time: new Date(),
             });
 
             return;
         }
 
-        if (matchBan) {
+        if (onBan) {
             this.emit('playerBanned', {
                 raw: decodedPacket.body,
-                playerID: matchBan[1],
-                steamID: matchBan[2],
-                name: matchBan[3],
-                interval: matchBan[4],
+                playerID: onBan[1],
+                steamID: onBan[2],
+                name: onBan[3],
+                interval: onBan[4],
                 time: new Date(),
             });
         }
 
-        if (matchWarn) {
+        if (onWarn) {
             this.emit('playerWarned', {
                 raw: decodedPacket.body,
-                name: matchWarn[1],
-                reason: matchWarn[2],
+                name: onWarn[1],
+                reason: onWarn[2],
+                time: new Date(),
+            });
+
+            return;
+        }
+
+        if (onPossessedAdminCam) {
+            this.emit('possessedAdminCam', {
+                raw: decodedPacket.body,
+                steamID: onPossessedAdminCam[2],
+                name: onPossessedAdminCam[3],
+                time: new Date(),
+            });
+
+            return;
+        }
+
+        if (onUnpossessedAdminCam) {
+            this.emit('unPossessedAdminCam', {
+                raw: decodedPacket.body,
+                steamID: onUnpossessedAdminCam[2],
+                name: onUnpossessedAdminCam[3],
                 time: new Date(),
             });
 
