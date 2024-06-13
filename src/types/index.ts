@@ -31,6 +31,11 @@ export interface ITeams {
     teamB: string | null;
 }
 
+export interface IFactions {
+    teamA: string | null;
+    teamB: string | null;
+}
+
 export interface ILayer {
     current: string | null;
     next: string | null;

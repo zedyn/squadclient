@@ -1,4 +1,4 @@
-import { ILayer, IOptions, IPlayer, IServer, ISquad, ITeams } from './types';
+import { IFactions, ILayer, IOptions, IPlayer, IServer, ISquad, ITeams } from './types';
 
 import Rcon from './structures/Rcon';
 
@@ -61,8 +61,8 @@ export class SquadClient extends Rcon {
         const serverInfo: IServer = JSON.parse(rawServerInfo);
 
         return {
-            current: match ? match[2] : null,
-            next: serverInfo.NextLayer_s ?? null,
+            current: match ? match[2].split(',')[0] : null,
+            next: serverInfo.NextLayer_s.replaceAll(' ', '_') ?? null,
         };
     }
 
@@ -149,5 +149,20 @@ export class SquadClient extends Rcon {
         }
 
         return players;
+    }
+
+    public async getCurrentFactions(): Promise<IFactions> {
+        if (!super.isConnected()) {
+            await super.connect();
+        }
+
+        const response: string = await super.execute('ShowCurrentMap');
+
+        const match: RegExpMatchArray | null = response.match(/^Current level is (.*), layer is (.*)/);
+
+        return {
+            teamA: match ? match[2].split('factions ')[1].split(' ')[0] : null,
+            teamB: match ? match[2].split('factions ')[1].split(' ')[1] : null,
+        };
     }
 }
